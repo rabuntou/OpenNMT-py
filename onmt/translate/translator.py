@@ -186,6 +186,10 @@ class Translator(object):
 
         all_scores = []
         all_predictions = []
+        my_data = dict() #####
+        my_data['srcs'] = [] #####
+        my_data['tgts'] = [] #####
+        my_data['inds'] = [] #####
 
         for batch in data_iter:
             batch_data = self.translate_batch(batch, data, attn_debug,
@@ -193,6 +197,11 @@ class Translator(object):
             translations = builder.from_batch(batch_data)
 
             for trans in translations:
+                attn = trans.attns[0] #####
+                my_data['srcs'].append(list(trans.src_raw)) #####
+                my_data['tgts'].append(trans.pred_sents[0]) #####
+                inds = torch.Tensor.tolist(attn.max(1)[1])[0: -1] #####
+                my_data['inds'].append(inds) #####
                 all_scores += [trans.pred_scores[:self.n_best]]
                 pred_score_total += trans.pred_scores[0]
                 pred_words_total += len(trans.pred_sents[0])
@@ -267,7 +276,7 @@ class Translator(object):
             import json
             json.dump(self.translator.beam_accum,
                       codecs.open(self.dump_beam, 'w', 'utf-8'))
-        return all_scores, all_predictions
+        return all_scores, all_predictions, my_data #####
 
     def translate_batch(self, batch, data, attn_debug, fast=False):
         """

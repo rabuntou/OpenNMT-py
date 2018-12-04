@@ -71,13 +71,15 @@ def start(config_file,
         inputs = request.get_json(force=True)
         out = {}
         try:
-            translation, scores, n_best, times = translation_server.run(inputs)
+            translation, scores, n_best, times, my_data = translation_server.run(inputs) #####
+            inds = my_data['inds'] #####
             assert len(translation) == len(inputs)
             assert len(scores) == len(inputs)
 
             out = [[{"src": inputs[i]['src'], "tgt": translation[i],
                      "n_best": n_best,
-                     "pred_score": scores[i]}
+                     "pred_score": scores[i], #####
+                     "tgt2src": ' '.join(map(lambda x: str(x), inds[i]))} #####
                     for i in range(len(translation))]]
         except ServerModelError as e:
             out['error'] = str(e)
@@ -116,7 +118,7 @@ if __name__ == '__main__':
     parser.add_argument("--config", "-c", type=str,
                         default="./available_models/conf.json")
 
-    opts.config_opts(parser)
+    #opts.config_opts(parser)
     args = parser.parse_args()
     start(args.config, url_root=args.url_root, host=args.ip, port=args.port,
           debug=args.debug)

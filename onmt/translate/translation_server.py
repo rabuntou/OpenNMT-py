@@ -360,7 +360,7 @@ class ServerModel:
         predictions = []
         if len(texts_to_translate) > 0:
             try:
-                scores, predictions = self.translator.translate(
+                scores, predictions, my_data = self.translator.translate( #####
                     src_data_iter=texts_to_translate,
                     batch_size=self.opt.batch_size)
             except (RuntimeError, Exception) as e:
@@ -401,7 +401,7 @@ class ServerModel:
 
         self.logger.info("Translation Results: %d", len(results))
         self.running_lock.release()
-        return results, scores, self.opt.n_best, timer.times
+        return results, scores, self.opt.n_best, timer.times, my_data #####
 
     def do_timeout(self):
         """Timeout function that free GPU memory by moving the model to CPU
